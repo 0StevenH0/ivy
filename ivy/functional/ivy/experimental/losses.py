@@ -159,6 +159,58 @@ def l1_loss(
 @handle_array_like_without_promotion
 @inputs_to_ivy_arrays
 @handle_array_function
+def l2_loss(
+    input: Union[ivy.Array, ivy.NativeArray],
+    /,
+    *,
+    reduction: Optional[str] = "sum",
+    out: Optional[ivy.Array] = None,
+) -> ivy.Array:
+    """
+    Computes half the L2 norm without the sqrt.
+
+    Parameters
+    ----------
+    input
+        Input array containing input values.
+    reduction
+        Reduction method for the output loss. Options:
+        "none" (no reduction), "mean" (mean of losses),
+        "sum" (sum of losses). Default: "mean".
+    out
+        Optional output array for writing the result to.
+        It must have a shape that the inputs broadcast to.
+
+
+    Returns
+    -------
+    ivy.Array
+        The L2 loss of the given value
+    Examples
+    --------
+    >>> a = ivy.array([[1,2,3],[4,5,6]])
+    >>> b = ivy.l2_loss(a)
+    >>> print(b)
+    ivy.array(7.)
+    >>> a = ivy.array([[1,2,3],[4,5,6]])
+    >>> b = ivy.l2_loss(a)
+    >>> print(b)
+    ivy.array(45.5)
+    """
+    loss= ivy.pow(input,2)
+    if reduction == "sum":
+        return ivy.divide(ivy.sum(loss, out=out),2)
+    elif reduction == "mean":
+        return ivy.divide(ivy.mean(loss, out=out),2)
+    else:
+        return ivy.inplace_update(out, loss) if out is not None else loss
+
+
+@handle_exceptions
+@handle_nestable
+@handle_array_like_without_promotion
+@inputs_to_ivy_arrays
+@handle_array_function
 def huber_loss(
     true: Union[ivy.Array, ivy.NativeArray],
     pred: Union[ivy.Array, ivy.NativeArray],
